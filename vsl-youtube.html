@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THIS WAS HIDDEN FROM YOU... BUT TODAY IT WILL BE REVEALED LIVE</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: #0f0f0f;
+    color: #f1f1f1;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .yt-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0f0f0f;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 56px;
+    gap: 8px;
+    border-bottom: 1px solid #272727;
+  }
+  .yt-nav-left { display: flex; align-items: center; gap: 16px; }
+  .hamburger { width: 24px; height: 24px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-around; padding: 2px; }
+  .hamburger span { display: block; height: 2px; background: #f1f1f1; border-radius: 1px; }
+  .yt-logo { display: flex; align-items: center; gap: 4px; text-decoration: none; }
+  .yt-logo svg { width: 90px; height: 20px; }
+  .yt-search-wrap { flex: 1; max-width: 600px; margin: 0 auto; display: flex; }
+  .yt-search { width: 100%; background: #121212; border: 1px solid #303030; border-right: none; border-radius: 20px 0 0 20px; padding: 8px 16px; color: #f1f1f1; font-size: 16px; outline: none; }
+  .yt-search:focus { border-color: #1c62b9; }
+  .yt-search-btn { background: #222; border: 1px solid #303030; border-left: none; border-radius: 0 20px 20px 0; padding: 0 20px; cursor: pointer; color: #f1f1f1; }
+  .yt-search-btn:hover { background: #303030; }
+  .yt-nav-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .yt-icon-btn { background: none; border: none; cursor: pointer; color: #f1f1f1; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .yt-icon-btn:hover { background: #272727; }
+  .yt-sign-in { background: transparent; border: 1px solid #3ea6ff; color: #3ea6ff; border-radius: 18px; padding: 6px 15px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+  .yt-sign-in:hover { background: rgba(62,166,255,0.1); }
+
+  /* ── MAIN LAYOUT ── */
+  .yt-main {
+    display: flex;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    gap: 24px;
+  }
+
+  /* ── LEFT (video + info) ── */
+  .yt-left { flex: 1; min-width: 0; }
+
+  /* ── VIDEO PLAYER ── */
+  .yt-player-wrap {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+    max-height: 520px;
+    width: auto;
+    margin: 0 auto;
+  }
+  @media (min-width: 700px) {
+    .yt-player-wrap { aspect-ratio: 16/9; max-height: unset; max-width: 100%; }
+  }
+  .yt-player-wrap iframe, .yt-player-wrap video {
+    width: 100%; height: 100%; border: none; display: block;
+  }
+  /* VTURB PROGRESS BAR */
+  #vturb-bar-wrap {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: rgba(255,255,255,0.18);
+    z-index: 20;
+    cursor: default !important;
+    user-select: none;
+    pointer-events: none;
+  }
+  #vturb-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #ff0000;
+    transition: width 1s linear;
+    position: relative;
+  }
+  #vturb-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: -5px; top: -3px;
+    width: 11px; height: 11px;
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  }
+  /* BLOCK YT BRANDING */
+  #yt-brand-shield {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 180px; height: 52px;
+    background: #000;
+    z-index: 19;
+    pointer-events: none;
+  }
+  .yt-player-placeholder {
+    width: 100%; height: 100%;
+    background: #c00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    padding: 32px;
+  }
+  .yt-resume-box {
+    background: rgba(0,0,0,0.8);
+    border-radius: 8px;
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 280px;
+  }
+  .yt-resume-box p { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .yt-resume-btn {
+    display: flex; align-items: center; gap: 12px;
+    background: none; border: none; color: #fff;
+    font-size: 14px; cursor: pointer; padding: 8px 0;
+    text-align: left; width: 100%;
+  }
+  .yt-resume-btn:hover { color: #aaa; }
+  .yt-resume-btn svg { flex-shrink: 0; }
+
+  /* LIVE BADGE */
+  .yt-live-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: #c00;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+  }
+
+  /* ── VIDEO TITLE + META ── */
+  .yt-video-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 12px 0 8px;
+    color: #f1f1f1;
+  }
+  .yt-channel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .yt-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a4a8a, #3ea6ff);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: #fff;
+    flex-shrink: 0;
+  }
+  .yt-channel-info { flex: 1; }
+  .yt-channel-name {
+    font-size: 14px; font-weight: 600; color: #f1f1f1;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .yt-verified { color: #aaa; }
+  .yt-subs { font-size: 12px; color: #aaa; }
+  .yt-subscribe-btn {
+    background: #f1f1f1;
+    color: #0f0f0f;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .yt-subscribe-btn:hover { background: #d9d9d9; }
+
+  /* ACTIONS ROW */
+  .yt-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .yt-action-group {
+    display: flex;
+    background: #272727;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .yt-action-btn {
+    background: none; border: none; color: #f1f1f1;
+    padding: 8px 14px; font-size: 14px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .yt-action-btn:hover { background: #3f3f3f; }
+  .yt-action-btn.divider { border-left: 1px solid #3f3f3f; }
+  .yt-action-standalone {
+    background: #272727; border: none; color: #f1f1f1;
+    padding: 8px 16px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border-radius: 18px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .yt-action-standalone:hover { background: #3f3f3f; }
+
+  /* DESCRIPTION BOX */
+  .yt-desc-box {
+    background: #272727;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #f1f1f1;
+    margin-bottom: 24px;
+  }
+  .yt-desc-box .views-date { font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+  .yt-desc-line { color: #c00; font-weight: 600; }
+  .yt-show-more { color: #f1f1f1; cursor: pointer; font-weight: 600; font-size: 13px; margin-top: 6px; display: inline-block; }
+
+  /* ── RIGHT: LIVE CHAT ── */
+  .yt-right {
+    width: 340px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 900px) {
+    .yt-main { flex-direction: column; }
+    .yt-right { width: 100%; }
+  }
+
+  .yt-chat-container {
+    background: #0f0f0f;
+    border: 1px solid #272727;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow: hidden;
+  }
+  .yt-chat-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #272727;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .yt-live-dot {
+    width: 8px; height: 8px;
+    background: #c00;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .yt-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+    scroll-behavior: smooth;
+  }
+  .yt-chat-messages::-webkit-scrollbar { width: 4px; }
+  .yt-chat-messages::-webkit-scrollbar-thumb { background: #3f3f3f; border-radius: 2px; }
+
+  .yt-chat-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 16px;
+    font-size: 13px;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .yt-msg-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .yt-msg-user { font-weight: 600; color: #aaa; font-size: 12px; }
+  .yt-msg-text { color: #f1f1f1; }
+
+  .yt-chat-input-row {
+    border-top: 1px solid #272727;
+    padding: 12px 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .yt-chat-user-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #3f3f3f;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #aaa; flex-shrink: 0;
+  }
+  .yt-chat-input {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #3f3f3f;
+    color: #aaa;
+    font-size: 13px;
+    padding: 4px 0;
+    outline: none;
+  }
+  .yt-chat-input:focus { border-bottom-color: #f1f1f1; color: #f1f1f1; }
+  .yt-chat-send {
+    background: none; border: none;
+    color: #3f3f3f; cursor: pointer;
+    display: flex; align-items: center;
+  }
+
+  /* CTA OVERLAY (shown after N minutes) */
+  .yt-cta-bar {
+    display: none;
+    background: linear-gradient(135deg, #1a0a00, #3d1500);
+    border: 1px solid #ff6a00;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .yt-cta-bar.visible { display: block; animation: fadeIn 0.5s ease; }
+  .yt-cta-bar h3 { color: #ffd700; font-size: 15px; margin-bottom: 8px; }
+  .yt-cta-bar p { color: #f1f1f1; font-size: 13px; margin-bottom: 12px; }
+  .yt-cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+  }
+  .yt-cta-btn:hover { opacity: 0.9; transform: scale(1.02); transition: all 0.2s; }
+
+  /* COUNTER */
+  .yt-viewer-count {
+    font-size: 12px; color: #aaa;
+    display: flex; align-items: center; gap: 6px;
+    margin-left: auto;
+  }
+  .yt-viewer-dot { width: 6px; height: 6px; background: #c00; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="yt-nav">
+  <div class="yt-nav-left">
+    <div class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+    <a href="#" class="yt-logo">
+      <!-- YouTube-style wordmark -->
+      <svg viewBox="0 0 90 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.6 3.3s-.2-1.4-.8-2C16 .5 15.1.5 14.7.5 12.3.3 8.5.3 8.5.3s-3.8 0-6.2.2C1.9.5 1 .5.2 1.3c-.6.6-.8 2-.8 2S-.8 4.9-.8 6.5v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C4 14.2 8.5 14.2 8.5 14.2s3.8 0 6.2-.2c.4 0 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2V6.5c0-1.6-.2-3.2-.2-3.2zM6.7 9.8V4.4l5.7 2.7-5.7 2.7z" fill="#FF0000"/>
+        <text x="20" y="14" font-family="Arial" font-weight="700" font-size="14" fill="#FFFFFF">SanBenito</text>
+      </svg>
+    </a>
+  </div>
+
+  <div class="yt-search-wrap">
+    <input class="yt-search" type="text" placeholder="Search">
+    <button class="yt-search-btn" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.87 20.17l-5.59-5.59A7.5 7.5 0 1 0 14.5 16l5.59 5.59zM6.5 14A5.5 5.5 0 1 1 12 8.5 5.51 5.51 0 0 1 6.5 14z"/></svg>
+    </button>
+  </div>
+
+  <div class="yt-nav-right">
+    <button class="yt-icon-btn" aria-label="Microphone">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15c1.7 0 3-1.3 3-3V6c0-1.7-1.3-3-3-3S9 4.3 9 6v6c0 1.7 1.3 3 3 3zm-1-9c0-.6.4-1 1-1s1 .4 1 1v6c0 .6-.4 1-1 1s-1-.4-1-1V6zm6 6c0 2.8-2.2 5-5 5s-5-2.2-5-5H5c0 3.5 2.6 6.4 6 6.9V21h2v-2.1c3.4-.5 6-3.4 6-6.9h-2z"/></svg>
+    </button>
+    <button class="yt-icon-btn" aria-label="Notifications">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.1-1.6-5.6-4.5-6.3V4c0-.8-.7-1.5-1.5-1.5S10.5 3.2 10.5 4v.7C7.6 5.4 6 7.9 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+    </button>
+    <button class="yt-sign-in">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      Sign in
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="yt-main">
+
+  <!-- LEFT -->
+  <div class="yt-left">
+
+    <!-- PLAYER -->
+    <div class="yt-player-wrap" id="playerWrap" style="position:relative;">
+      <div class="yt-live-badge" style="z-index:6;">&#9679; LIVE</div>
+      <div id="ytPlayer" style="width:100%;height:100%;"></div>
+      <div id="playerOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;cursor:default;"></div>
+      <div id="clickTooltip" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;text-align:center;z-index:10;pointer-events:none;">&#9203; Watch until the end to unlock access</div>
+      <!-- VTURB-STYLE PROGRESS BAR -->
+      <div id="vturb-bar-wrap"><div id="vturb-bar-fill"></div></div>
+      <!-- BLOCK YT LOGO -->
+      <div id="yt-brand-shield"></div>
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="yt-video-title" id="videoTitle">
+      THIS WAS HIDDEN FROM YOU... BUT TODAY IT WILL BE REVEALED LIVE
+    </h1>
+
+    <!-- CHANNEL ROW + ACTIONS (same line like real YT) -->
+    <div class="yt-channel-row">
+      <div class="yt-avatar">
+        <img src="https://i.pravatar.cc/40?img=51" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">
+      </div>
+      <div class="yt-channel-info">
+        <div class="yt-channel-name">
+          Father Juan Mendez
+          <!-- verified checkmark -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#aaa" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div class="yt-subs">93K subscribers</div>
+      </div>
+      <button class="yt-subscribe-btn">Subscribe</button>
+
+      <!-- ACTIONS pushed to right -->
+      <div style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+        <div class="yt-action-group">
+          <button class="yt-action-btn" id="likeBtn" onclick="handleLike()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+            <span id="likeCount">54K</span>
+          </button>
+          <button class="yt-action-btn divider" aria-label="Dislike">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+          </button>
+        </div>
+        <button class="yt-action-standalone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+          Share
+        </button>
+        <button class="yt-action-standalone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+          Save
+        </button>
+        <button class="yt-action-standalone" style="padding:8px;" aria-label="More">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="yt-desc-box" id="descBox">
+      <div id="descCollapsed" style="font-size:13px; line-height:1.8; color:#f1f1f1;">
+        This video will be deleted immediately after the live stream ends...<br>
+        (Do not refresh or leave this page)
+      </div>
+      <div id="descExpanded" style="font-size:13px; line-height:1.8; color:#f1f1f1; display:none;">
+        This video will be deleted immediately after the live stream ends...<br>
+        (Do not refresh or leave this page)<br><br>
+        In this live stream, you will discover:<br><br>
+        • Why your prayers are being ignored<br>
+        • The hidden flaw that silently blocks your miracles<br>
+        • And the exact method that has been kept secret for years<br><br>
+        👉 Watch until the end. This may be your only chance to understand what's been holding you back.
+      </div>
+      <span class="yt-show-more" id="showMoreBtn" onclick="toggleDesc()">...Show more</span>
+    </div>
+
+    <!-- CHECKOUT LINK (appears 1 min before end) -->
+    <div id="checkoutBar" style="display:none; background:#272727; border-radius:12px; padding:16px 20px; margin-bottom:16px; border-left:4px solid #c00; animation: fadeIn 0.5s ease;">
+      <div style="font-size:13px; color:#aaa; margin-bottom:8px;">🔴 Live ending soon — last chance</div>
+      <a id="checkoutLink" href="#" style="display:block; background:#c00; color:#fff; text-align:center; padding:14px; border-radius:8px; font-size:15px; font-weight:700; text-decoration:none; letter-spacing:0.3px;">
+        ✝️ CLAIM YOUR ACCESS NOW — $19
+      </a>
+      <div style="font-size:12px; color:#aaa; text-align:center; margin-top:8px;">⚠️ This page will be removed when the stream ends</div>
+    </div>
+
+    <!-- CTA BAR (appears after ~90s) -->
+    <div class="yt-cta-bar" id="ctaBar">
+      <h3>🔓 Special Access — Only for those watching LIVE</h3>
+      <p>Click now to secure your access to St. Benedict's Sacred Prayer before this video is removed.</p>
+      <a href="#" class="yt-cta-btn">✝️ CLAIM MY ACCESS NOW — $19</a>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: LIVE CHAT -->
+  <div class="yt-right">
+    <div class="yt-chat-container">
+      <div class="yt-chat-header">
+        <div class="yt-live-dot"></div>
+        CHAT LIVE
+        <div class="yt-viewer-count">
+          <div class="yt-viewer-dot"></div>
+          <span id="chatViewerCount">1.247</span>
+        </div>
+      </div>
+      <div class="yt-chat-messages" id="chatMessages"></div>
+      <div class="yt-chat-input-row">
+        <div class="yt-chat-user-avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        </div>
+        <input class="yt-chat-input" placeholder="Say something..." readonly onclick="this.placeholder='Sign in to comment'">
+        <button class="yt-chat-send" aria-label="Send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── AVATAR COLORS ──
+const avatarColors = [
+  ['#1565c0','#e3f2fd'],['#6a1b9a','#f3e5f5'],['#2e7d32','#e8f5e9'],
+  ['#e65100','#fff3e0'],['#880e4f','#fce4ec'],['#00695c','#e0f2f1'],
+  ['#4527a0','#ede7f6'],['#c62828','#ffebee'],['#0277bd','#e1f5fe'],
+  ['#558b2f','#f1f8e9'],['#ef6c00','#fff8e1'],['#ad1457','#fce4ec']
+];
+function getAvatarColor(username) {
+  let h = 0;
+  for (let c of username) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+  return avatarColors[Math.abs(h) % avatarColors.length];
+}
+function initials(username) {
+  return username.replace(/[^a-zA-Z]/g,'').substring(0,2).toUpperCase() || 'U';
+}
+
+// ── CHAT MESSAGES ──
+const chatMsgs = [
+  {t:2000,u:"gloria.hayes",msg:"I feel like he's talking to me.."},
+  {t:4500,u:"tammie_w",msg:"THIS TOUCHED MY SOUL"},
+  {t:7000,u:"laura.reynolds77",msg:"I almost cried..."},
+  {t:9500,u:"roland_c",msg:"I've been asking for a sign."},
+  {t:12000,u:"bev.morales",msg:"🙏 🙏 🙏"},
+  {t:14000,u:"user_7741",msg:"Don't scroll"},
+  {t:16500,u:"patricia.dm",msg:"Amen 🙏 🔥"},
+  {t:18000,u:"xochitl_r",msg:"Something is happening"},
+  {t:20000,u:"deborah.foster",msg:"Wait... Pope Francis?? 😮"},
+  {t:22000,u:"connie39",msg:"this is serious 🙏 🙏 🙏"},
+  {t:25000,u:"rosemary.h",msg:"God brought me here 🙏"},
+  {t:27000,u:"nadia_moon88",msg:"This is very powerful, wow."},
+  {t:29000,u:"catherine_b",msg:"I'm trembling..."},
+  {t:31000,u:"eleanor.t",msg:"this is real..."},
+  {t:33000,u:"samara.p",msg:"Amen Amen 🙏"},
+  {t:35500,u:"mateo.v1",msg:"Amen 🙏"},
+  {t:37000,u:"rebeccareid_",msg:"praying for my family 👨‍👩‍👧"},
+  {t:39000,u:"yvonne_grey",msg:"I am in debt..."},
+  {t:41000,u:"claire.nw",msg:"I need a miracle right now."},
+  {t:43500,u:"patty_rx",msg:"Amen! 🙏 ✨"},
+  {t:46000,u:"nicole.marsh",msg:"praying for healing..."},
+  {t:49000,u:"wendy_b2",msg:"I feel a lot of emotion"},
+  {t:51000,u:"hector.v",msg:"🙏 👋"},
+  {t:53000,u:"abby_423",msg:"🙏 🙏"},
+  {t:55500,u:"marcusowens1",msg:"writing my intention here"},
+  {t:57000,u:"charlene_r",msg:"God please hear me"},
+  {t:59000,u:"abel.s_cruz",msg:"this is deep.... 😮"},
+  {t:61500,u:"marlym",msg:"I already feel peace"},
+  {t:63000,u:"nat.elise",msg:"Something is changing inside me 😮"},
+  {t:65000,u:"david.t82",msg:"I'm crying..."},
+  {t:67000,u:"pete_arj",msg:"Amen 🙏 ❤️"},
+  {t:70000,u:"normanwk",msg:"Don't leave this live stream"},
+  {t:72000,u:"lefandra_r",msg:"😮 🙏"},
+  {t:74000,u:"paseualina",msg:"AMEEEN 🙏"},
+  {t:76000,u:"beto.lives",msg:"I started this prayer a few days ago... I felt peace."},
+  {t:78500,u:"lucy.harper_",msg:"My anxiety decreased significantly."},
+  {t:80000,u:"emmanuelo",msg:"I sleep better now"},
+  {t:82000,u:"antoniusl",msg:"Amen Amen Amen 🙏 🔥"},
+  {t:84000,u:"kevin.w21",msg:"This really works."},
+  {t:86000,u:"nate.alford",msg:"IT'S NOT A COINCIDENCE"},
+  {t:89000,u:"mia_gray08",msg:"I feel urgency..."},
+  {t:91000,u:"stefanie_cole_",msg:"Something tells me to act"},
+  {t:93000,u:"amanda_stevens",msg:"Just do it"},
+  {t:95000,u:"w.ilson_t",msg:"go now"},
+  {t:97000,u:"sara.reynolds77",msg:"I just clicked"},
+  {t:99000,u:"dylan_parker88",msg:"I already have my access"},
+  {t:101000,u:"mary_f.11",msg:"I already insured mine 🙌"},
+  {t:103000,u:"kevin_wilson21",msg:"I already received the email"},
+  {t:105000,u:"carla.m99",msg:"that was fast..."},
+  {t:107000,u:"micaela.b_",msg:"I already feel peace"},
+  {t:109000,u:"samantha_c",msg:"starting today..."},
+  {t:111000,u:"thomas.k",msg:"God is good 🙏"},
+  {t:113000,u:"patrice_m",msg:"I'm sharing this with my family"},
+  {t:116000,u:"rob.castillo",msg:"This changed my morning"},
+  {t:118000,u:"linda_s22",msg:"Already on day 3 🙏"},
+  {t:120000,u:"james.w",msg:"I felt something shift"},
+  {t:122000,u:"helen.rue",msg:"My husband noticed a difference"},
+  {t:125000,u:"carlos_m",msg:"Incredible. Just incredible."},
+  {t:127000,u:"diana.p",msg:"I cried during the prayer"},
+  {t:130000,u:"felix.ng",msg:"still watching 🙏"},
+  {t:132000,u:"grace_e",msg:"this is what I needed today"},
+  {t:135000,u:"victor.h",msg:"Amen from Brazil 🇧🇷"},
+  {t:138000,u:"anna.l",msg:"Sharing with everyone I know"},
+  {t:141000,u:"mike.d",msg:"I just ordered, fast process"},
+  {t:143000,u:"sophie_b",msg:"Worth every penny"},
+  {t:146000,u:"paul.r",msg:"God bless Father Juan 🙏"},
+  {t:149000,u:"mary.k",msg:"I'm not crying, you're crying 😭"},
+  {t:152000,u:"jose.c",msg:"Day 1 done. I feel lighter."},
+  {t:155000,u:"natalia_v",msg:"This is the real thing 🙏 🔥"},
+  {t:158000,u:"derek.f",msg:"I've tried everything else. This works."},
+  {t:161000,u:"clara.g",msg:"My debt situation is already shifting"},
+  {t:164000,u:"ibrahim.k",msg:"Amen Amen Amen"},
+  {t:167000,u:"lucia.p",msg:"Just got my email confirmation! 🙌"},
+  {t:170000,u:"frank.m",msg:"Don't hesitate. Just click."},
+  {t:173000,u:"anna.s",msg:"I feel protected now"},
+  {t:176000,u:"ben.w",msg:"Something big is coming 🙏"},
+  {t:179000,u:"rose.t",msg:"Already feeling the shift"},
+  {t:182000,u:"gloria.h",msg:"Day 7 and I got a job offer 🙏"},
+  {t:185000,u:"carlos.r",msg:"This is the best $19 I ever spent"},
+  {t:188000,u:"sarah.b",msg:"My mom's health is improving 🙏"},
+  {t:191000,u:"john.d",msg:"Amen from Mexico 🇲🇽"},
+  {t:194000,u:"maria.e",msg:"I can't stop crying... in a good way"},
+  {t:197000,u:"peter.k",msg:"God is so faithful"},
+  {t:200000,u:"diana.l",msg:"Already feeling calmer 🙏"},
+];
+
+const chatEl = document.getElementById('chatMessages');
+let msgIndex = 0;
+let startTime = null;
+let chatInterval = null;
+let viewerCount = 1247;
+
+function addChatMsg(username, message) {
+  const [bg, text] = getAvatarColor(username);
+  const div = document.createElement('div');
+  div.className = 'yt-chat-msg';
+  div.innerHTML = `
+    <div class="yt-msg-avatar" style="background:${bg};color:${text}">${initials(username)}</div>
+    <div>
+      <span class="yt-msg-user">@${username}</span>
+      <span class="yt-msg-text"> ${message}</span>
+    </div>`;
+  chatEl.appendChild(div);
+  // keep last 30 msgs
+  while (chatEl.children.length > 30) chatEl.removeChild(chatEl.firstChild);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function startChat() {
+  startTime = Date.now();
+  // Pre-populate with a few messages
+  addChatMsg("father_juan_parish", "🙏 Welcome to our sacred live stream");
+  addChatMsg("tiffany.rowe", "Thank God for being here today");
+  addChatMsg("brenda_m", "Amen 🙏");
+
+  chatInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    while (msgIndex < chatMsgs.length && chatMsgs[msgIndex].t <= elapsed) {
+      addChatMsg(chatMsgs[msgIndex].u, chatMsgs[msgIndex].msg);
+      msgIndex++;
+    }
+    if (msgIndex >= chatMsgs.length) {
+      // Loop chat after all messages shown
+      msgIndex = 0;
+      startTime = Date.now() - 5000;
+    }
+  }, 500);
+}
+
+// ── VIEWER COUNT FLUCTUATION ──
+function updateViewers() {
+  const delta = Math.floor(Math.random() * 20) - 8;
+  viewerCount = Math.max(900, viewerCount + delta);
+  const formatted = viewerCount.toLocaleString('en-US');
+  const el = document.getElementById('viewerCounter');
+  const el2 = document.getElementById('chatViewerCount');
+  if (el) el.textContent = formatted;
+  if (el2) el2.textContent = formatted;
+}
+setInterval(updateViewers, 4000);
+
+// ── UPDATE TITLE DATE ──
+function updateDate() {
+  const now = new Date();
+  const d = now.toLocaleDateString('en-US');
+  const t = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+  const el = document.getElementById('videoTitle');
+  if (el) el.textContent = `THIS WAS HIDDEN FROM YOU... BUT TODAY IT WILL BE REVEALED LIVE ÀS ${t}, ${d}`;
+}
+updateDate();
+
+// ── CTA SHOW AFTER 90s ──
+setTimeout(() => {
+  const cta = document.getElementById('ctaBar');
+  if (cta) cta.classList.add('visible');
+}, 90000);
+
+// ── TOGGLE DESCRIPTION ──
+function toggleDesc() {
+  const collapsed = document.getElementById('descCollapsed');
+  const expanded = document.getElementById('descExpanded');
+  const btn = document.getElementById('showMoreBtn');
+  const isCollapsed = expanded.style.display === 'none';
+  collapsed.style.display = isCollapsed ? 'none' : 'block';
+  expanded.style.display = isCollapsed ? 'block' : 'none';
+  btn.textContent = isCollapsed ? 'Show less' : '...Show more';
+}
+
+// ── YOUTUBE IFRAME API ──
+const VIDEO_ID = 'hcnjHDtyjsk';
+const VIDEO_DURATION_SECONDS = 1827; // 30:27
+const CHECKOUT_URL = '#'; // ← replace with your actual checkout URL
+let ytPlayer;
+
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    videoId: VIDEO_ID,
+    playerVars: {
+      autoplay: 1,
+      mute: 1,
+      controls: 0,
+      modestbranding: 1,
+      rel: 0,
+      showinfo: 0,
+      disablekb: 1,
+      iv_load_policy: 3,
+      fs: 0,
+      playsinline: 1
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerReady(e) {
+  e.target.playVideo();
+  // unmute after 500ms (needed after autoplay with mute:1)
+  setTimeout(() => { try { e.target.unMute(); e.target.setVolume(100); } catch(err){} }, 600);
+  startCheckoutTimer();
+  startProgressBar();
+}
+
+function onPlayerStateChange(e) {
+  // If paused or ended, restart (force watching)
+  if (e.data === YT.PlayerState.PAUSED) {
+    setTimeout(() => { if (ytPlayer) ytPlayer.playVideo(); }, 500);
+  }
+  if (e.data === YT.PlayerState.ENDED) {
+    showCheckoutBar();
+  }
+}
+
+// Block overlay click — show tooltip briefly
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('playerOverlay');
+  const tooltip = document.getElementById('clickTooltip');
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      tooltip.style.display = 'block';
+      clearTimeout(overlay._tt);
+      overlay._tt = setTimeout(() => { tooltip.style.display = 'none'; }, 2000);
+    });
+  }
+});
+
+// ── VTURB PROGRESS BAR ──
+let progressInterval = null;
+function startProgressBar() {
+  const fill = document.getElementById('vturb-bar-fill');
+  if (!fill) return;
+  const totalMs = VIDEO_DURATION_SECONDS * 1000;
+  const startTime = Date.now();
+  progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const pct = Math.min((elapsed / totalMs) * 100, 100);
+    fill.style.width = pct + '%';
+    // sync with actual player if available
+    try {
+      if (ytPlayer && ytPlayer.getCurrentTime) {
+        const cur = ytPlayer.getCurrentTime();
+        const real = Math.min((cur / VIDEO_DURATION_SECONDS) * 100, 100);
+        fill.style.width = real + '%';
+      }
+    } catch(e) {}
+    if (pct >= 100) clearInterval(progressInterval);
+  }, 1000);
+}
+
+function showCheckoutBar() {
+  const bar = document.getElementById('checkoutBar');
+  const link = document.getElementById('checkoutLink');
+  if (link) link.href = CHECKOUT_URL;
+  if (bar) {
+    bar.style.display = 'block';
+    bar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  addChatMsg("father_juan_parish", "👇 The link is now open below — grab your access before this stream ends!");
+}
+
+function startCheckoutTimer() {
+  const showAt = (VIDEO_DURATION_SECONDS - 60) * 1000;
+  setTimeout(showCheckoutBar, showAt);
+}
+
+// ── LIKE BUTTON ──
+let liked = false;
+function handleLike() {
+  liked = !liked;
+  const btn = document.getElementById('likeBtn');
+  const count = document.getElementById('likeCount');
+  if (liked) {
+    btn.style.color = '#3ea6ff';
+    count.textContent = '54.001';
+  } else {
+    btn.style.color = '';
+    count.textContent = '54K';
+  }
+}
+
+// startVideo no longer needed — YouTube IFrame API auto-starts
+
+// ── AUTO-START CHAT on load ──
+window.addEventListener('load', () => {
+  startChat();
+});
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
